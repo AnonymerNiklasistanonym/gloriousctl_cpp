@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 enable_language(CXX)
 
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)					# don't let OPTION erase non-cache variables
 set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "" FORCE)	# disable compiler extensions
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)					# enable PIC
@@ -22,7 +24,7 @@ FetchContent_MakeAvailable(cmake-utils)
 FetchContent_GetProperties(cmake-utils)
 
 # project parameters
-set(project_name cpp-template)
+set(project_name gloriousctl_cpp)
 set(${project_name}_version_file app_version.hpp)
 set(${project_name}_version "1.0.0")
 set(cxx_standard cxx_std_20)
@@ -40,6 +42,9 @@ include(CheckPIESupported)
 check_pie_supported()
 include(cmake/platform.cmake)	# set up helper cache variables
 include("${cmake-utils_SOURCE_DIR}/cmake-utils.cmake")
+
+# packages
+find_package(HIDAPI REQUIRED)
 
 # git operations
 find_package(Git QUIET)
@@ -96,6 +101,10 @@ target_link_libraries(${PROJECT_NAME}
     ${PROJECT_NAME}::options
 )
 
+# Link with more libraries
+target_include_directories(${PROJECT_NAME} PRIVATE ${HIDAPI_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${HIDAPI_LIBRARY})
+
 if(W_MSBUILD)
   set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})	# set startup project for VS
 endif()
@@ -106,7 +115,7 @@ target_source_group(TARGET ${PROJECT_NAME})
 # version
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/${${project_name}_version_file}.in")
   configure_src_bin(
-    IN src/${${project_name}_version_file}.in 
+    IN src/${${project_name}_version_file}.in
     OUT ${project_name}/${${project_name}_version_file}
     TARGET ${project_name}
   )

@@ -9,3 +9,4 @@ CMakeSettings.json
 compile_commands.json
 /CMakePresets.json
 /CMakeUserPresets.json
+CMakeLists.txt.user

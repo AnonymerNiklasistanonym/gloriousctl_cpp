@@ -17,7 +17,7 @@ jobs:
           - os: windows-latest
             install: choco install ninja
           - os: ubuntu-latest
-            install: sudo apt install -yqq ninja-build
+            install: sudo apt install -yqq ninja-build libhidapi-dev
     steps:
       - uses: actions/checkout@v2
       - name: install
